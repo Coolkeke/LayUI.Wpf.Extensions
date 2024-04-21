@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+	<PropertyGroup>
+		<TargetFrameworks>net4.5.2;net4.6.2;net4.7.2;net4.8;net5.0-windows;net6.0-windows;net7.0-windows;</TargetFrameworks>
+		<UseWPF>true</UseWPF>
+		<AssemblyTitle>LayUI.Wpf.Extensions</AssemblyTitle>
+		<Description>这是一款WPF版Layui库扩展类</Description>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<GenerateDocumentationFile>False</GenerateDocumentationFile>
+	</PropertyGroup>
+
+</Project>
