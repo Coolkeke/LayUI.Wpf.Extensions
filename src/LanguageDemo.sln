@@ -5,7 +5,9 @@ VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LayUI.Wpf.Extensions.App", "LayUI.Wpf.Extensions.App\LayUI.Wpf.Extensions.App.csproj", "{5D59DDD0-9351-48D6-8A6F-D5CA32096DE7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LayUI.Wpf.Extensions", "LayUI.Wpf.Extensions\LayUI.Wpf.Extensions.csproj", "{1BCAE764-F524-4FE4-A5E0-0C30F15ACF1D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LayUI.Wpf.Extensions", "LayUI.Wpf.Extensions\LayUI.Wpf.Extensions.csproj", "{1BCAE764-F524-4FE4-A5E0-0C30F15ACF1D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LayUI.Wpf.Extensions.NugetApp", "LayUI.Wpf.Extensions.NugetApp\LayUI.Wpf.Extensions.NugetApp.csproj", "{190ABF4C-44D5-4BBB-BA18-FE48E62DD05C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{1BCAE764-F524-4FE4-A5E0-0C30F15ACF1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1BCAE764-F524-4FE4-A5E0-0C30F15ACF1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1BCAE764-F524-4FE4-A5E0-0C30F15ACF1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{190ABF4C-44D5-4BBB-BA18-FE48E62DD05C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{190ABF4C-44D5-4BBB-BA18-FE48E62DD05C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{190ABF4C-44D5-4BBB-BA18-FE48E62DD05C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{190ABF4C-44D5-4BBB-BA18-FE48E62DD05C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

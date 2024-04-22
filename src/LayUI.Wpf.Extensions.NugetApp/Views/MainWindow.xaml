@@ -1,0 +1,83 @@
+﻿<Window
+    x:Class="LayUI.Wpf.Extensions.NugetApp.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:be="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:lay="clr-namespace:LayUI.Wpf.Extensions;assembly=LayUI.Wpf.Extensions"
+    xmlns:prism="http://prismlibrary.com/"
+    Title="{lay:Language {Binding Title}}"
+    Width="1024"
+    Height="350"
+    prism:ViewModelLocator.AutoWireViewModel="True"
+    FontSize="30"
+    WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <StackPanel Width="200" Background="Black">
+            <Button Command="{Binding CNCommand}" Content="中文" />
+            <Button Command="{Binding USCommand}" Content="英文" />
+            <Button Command="{Binding LoadItemsCommand}" Content="重新加载翻译" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Margin="10,0">
+            <Grid Margin="0,5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="绑定翻译：" />
+                <TextBlock Grid.Column="1" Text="{lay:Language {Binding Name}}" />
+            </Grid>
+            <Grid Height="1" Background="Black" />
+            <Grid Margin="0,5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="固定文字翻译：" />
+                <TextBlock Grid.Column="1" Text="{lay:Language Key='123'}" />
+            </Grid>
+            <Grid Height="1" Background="Black" />
+            <Grid Margin="0,5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="动态设置列表翻译：" />
+                <TextBox Grid.Column="1" Text="{Binding Items[3].Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    <be:Interaction.Triggers>
+                        <be:EventTrigger EventName="TextChanged">
+                            <be:InvokeCommandAction Command="{Binding TextChangedCommand}" />
+                        </be:EventTrigger>
+                    </be:Interaction.Triggers>
+                </TextBox>
+            </Grid>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid Height="1" Background="Black" />
+                <TextBlock
+                    Grid.Column="1"
+                    Margin="10,0"
+                    Text="列表翻译" />
+                <Grid
+                    Grid.Column="2"
+                    Height="1"
+                    Background="Black" />
+            </Grid>
+            <ItemsControl Margin="0,5" ItemsSource="{Binding Items}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{lay:Language {Binding Value}}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <Grid Height="1" Background="Black" />
+        </StackPanel>
+    </Grid>
+</Window>
