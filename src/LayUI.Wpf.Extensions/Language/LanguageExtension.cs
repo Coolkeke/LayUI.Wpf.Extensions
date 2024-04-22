@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Markup;
 using System.Windows;
+using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace LayUI.Wpf.Extensions
 {
@@ -16,13 +18,17 @@ namespace LayUI.Wpf.Extensions
     public class LanguageExtension : MarkupExtension
     {
         private static Action action;
-        private Binding _Key;
+        private object _Key;
         public LanguageExtension() { }
-        public LanguageExtension(Binding key) : this() => Key = key;
+        public LanguageExtension(object key) : this()
+        {
+            _Key = key;
+        }
+
         /// <summary>
         /// 绑定源
         /// </summary>
-        public Binding Key
+        public object Key
         {
             get { return _Key; }
             set { _Key = value; }
@@ -105,21 +111,31 @@ namespace LayUI.Wpf.Extensions
             {
                 action += () =>
                 {
-                    BindingOperations.SetBinding(targetObject, targetProperty, new Binding
+                    Binding binding = new Binding()
                     {
-                        Path = _Key.Path,
                         Source = element.DataContext,
                         UpdateSourceTrigger = UpdateSourceTrigger.Explicit,
                         Mode = BindingMode.OneWay
-                    });
-                    value = element.GetValue(targetProperty) as string;
+                    };
+                    if (_Key is Binding)
+                    {
+                        binding.Path = ((Binding)_Key).Path;
+                        BindingOperations.SetBinding(targetObject, targetProperty, binding);
+                        value = element.GetValue(targetProperty) as string;
+                    }
+                    else
+                    {
+                        value = _Key.ToString();
+                    }
                     value = Source[value] == null ? value : Source[value];
                     element.SetValue(targetProperty, value);
                 };
                 Refresh();
+                if (value is null) value = string.Empty;
                 value = Source[value] == null ? value : Source[value];
+                return value;
             }
-            return value;
+            return string.Empty;
         }
     }
 }

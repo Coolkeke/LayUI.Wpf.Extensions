@@ -10,6 +10,6 @@ namespace LayUI.Wpf.Extensions.App.Views
         public MainWindow()
         {
             InitializeComponent();
-        }
+        } 
     }
 }

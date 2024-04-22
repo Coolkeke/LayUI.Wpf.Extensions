@@ -5,6 +5,17 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
   <ItemGroup>
+    <Page Remove="languages\en_US.xaml" />
+    <Page Remove="languages\zh_CN.xaml" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Prism.DryIoc" Version="8.1.97" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LayUI.Wpf.Extensions\LayUI.Wpf.Extensions.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="languages\en_US.xaml" />
+    <Resource Include="languages\zh_CN.xaml" />
   </ItemGroup>
 </Project>
