@@ -9,6 +9,7 @@ using System.Windows.Markup;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
+using System.Xml.Linq;
 
 namespace LayUI.Wpf.Extensions
 {
@@ -111,31 +112,43 @@ namespace LayUI.Wpf.Extensions
             {
                 action += () =>
                 {
-                    Binding binding = new Binding()
-                    {
-                        Source = element.DataContext,
-                        UpdateSourceTrigger = UpdateSourceTrigger.Explicit,
-                        Mode = BindingMode.OneWay
-                    };
-                    if (_Key is Binding)
-                    {
-                        binding.Path = ((Binding)_Key).Path;
-                        BindingOperations.SetBinding(targetObject, targetProperty, binding);
-                        value = element.GetValue(targetProperty) as string;
-                    }
-                    else
-                    {
-                        value = _Key.ToString();
-                    }
-                    value = Source[value] == null ? value : Source[value];
-                    element.SetValue(targetProperty, value);
+                    SetLanguage(targetObject, targetProperty, element.DataContext, ref value);
                 };
-                Refresh();
+                SetLanguage(targetObject, targetProperty, element.DataContext, ref value);
                 if (value is null) value = string.Empty;
                 value = Source[value] == null ? value : Source[value];
                 return value;
             }
             return string.Empty;
         }
+        /// <summary>
+        /// 修改文字翻译
+        /// </summary>
+        /// <param name="element">作用目标元素</param>
+        /// <param name="targetProperty">作用属性</param>
+        /// <param name="dataContext">数据上下文</param>
+        /// <param name="value">输出值</param>
+        private void SetLanguage(DependencyObject element, DependencyProperty targetProperty, object dataContext, ref object value)
+        {
+            Binding binding = new Binding()
+            {
+                Source = dataContext,
+                UpdateSourceTrigger = UpdateSourceTrigger.Explicit,
+                Mode = BindingMode.OneWay
+            };
+            if (_Key is Binding)
+            {
+                binding.Path = ((Binding)_Key).Path;
+                BindingOperations.SetBinding(element, targetProperty, binding);
+                value = element.GetValue(targetProperty) as string;
+            }
+            else
+            {
+                value = _Key.ToString();
+            }
+            value = Source[value] == null ? value : Source[value];
+            element.SetValue(targetProperty, value);
+        }
     }
+
 }
