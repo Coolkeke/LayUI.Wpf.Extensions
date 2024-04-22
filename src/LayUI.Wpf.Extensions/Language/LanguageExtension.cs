@@ -108,8 +108,12 @@ namespace LayUI.Wpf.Extensions
             if (provideValueTarget.TargetObject.GetType().FullName == "System.Windows.SharedDp") return this;
             if (!(provideValueTarget.TargetObject is DependencyObject targetObject)) return this;
             if (!(provideValueTarget.TargetProperty is DependencyProperty targetProperty)) return this;
-            if (targetObject is FrameworkElement element && element.DataContext != null)
+            if (targetObject is FrameworkElement element)
             {
+                element.DataContextChanged += (o, e) =>
+                {
+                    SetLanguage(targetObject, targetProperty, element.DataContext, ref value);
+                }; 
                 action += () =>
                 {
                     SetLanguage(targetObject, targetProperty, element.DataContext, ref value);
@@ -121,6 +125,7 @@ namespace LayUI.Wpf.Extensions
             }
             return string.Empty;
         }
+
         /// <summary>
         /// 修改文字翻译
         /// </summary>
@@ -141,11 +146,13 @@ namespace LayUI.Wpf.Extensions
                 binding.Path = ((Binding)_Key).Path;
                 BindingOperations.SetBinding(element, targetProperty, binding);
                 value = element.GetValue(targetProperty) as string;
+                if (string.IsNullOrEmpty(value.ToString())) value = ((Binding)_Key).Path.Path;
             }
             else
             {
                 value = _Key.ToString();
             }
+            if (value is null) value = string.Empty;
             value = Source[value] == null ? value : Source[value];
             element.SetValue(targetProperty, value);
         }
