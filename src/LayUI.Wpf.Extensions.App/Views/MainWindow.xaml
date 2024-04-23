@@ -4,6 +4,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:be="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:lay="clr-namespace:LayUI.Wpf.Extensions;assembly=LayUI.Wpf.Extensions"
+    xmlns:layUI="clr-namespace:LayUI.Wpf.Controls;assembly=LayUI.Wpf"
+    xmlns:layUIGlobal="clr-namespace:LayUI.Wpf.Global;assembly=LayUI.Wpf"
     xmlns:prism="http://prismlibrary.com/"
     Title="{lay:Language {Binding Title}}"
     Width="525"
@@ -11,25 +13,35 @@
     prism:ViewModelLocator.AutoWireViewModel="True"
     FontSize="20"
     WindowStartupLocation="CenterScreen">
-    <StackPanel>
-        <Button Command="{Binding CNCommand}" Content="中文" />
-        <Button Command="{Binding USCommand}" Content="英文" />
-        <Button Command="{Binding LoadItemsCommand}" Content="加载数据" />
-        <TextBlock Text="{lay:Language {Binding Name}}" />
-        <TextBlock Text="{lay:Language Key='123'}" />
-        <TextBox Text="{Binding Items[3].Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-            <be:Interaction.Triggers>
-                <be:EventTrigger EventName="TextChanged">
-                    <be:InvokeCommandAction Command="{Binding TextChangedCommand}" />
-                </be:EventTrigger>
-            </be:Interaction.Triggers>
-        </TextBox>
-        <ItemsControl ItemsSource="{Binding Items}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{lay:Language {Binding Value}}" />
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-    </StackPanel>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal">
+            <Button Command="{Binding CNCommand}" Content="中文" />
+            <Button Command="{Binding USCommand}" Content="英文" />
+            <Button Command="{Binding LoadItemsCommand}" Content="加载数据" />
+            <Button Command="{Binding MessageBoxCommand}" Content="打开对话框" />
+        </StackPanel>
+        <StackPanel Grid.Row="1">
+            <TextBlock Text="{lay:Language {Binding Name}}" />
+            <TextBlock Text="{lay:Language Key='123'}" />
+            <TextBox Text="{Binding Items[3].Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                <be:Interaction.Triggers>
+                    <be:EventTrigger EventName="TextChanged">
+                        <be:InvokeCommandAction Command="{Binding TextChangedCommand}" />
+                    </be:EventTrigger>
+                </be:Interaction.Triggers>
+            </TextBox>
+            <ItemsControl ItemsSource="{Binding Items}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{lay:Language {Binding Value}}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+        <layUI:LayDialogHost Grid.Row="1" layUIGlobal:LayDialog.Token="Root" />
+    </Grid>
 </Window>

@@ -5,4 +5,5 @@
     <sys:String x:Key="Name">Keke</sys:String>
     <sys:String x:Key="Test">英文Test</sys:String>
     <sys:String x:Key="Title">Welcome to use multilingual plugins</sys:String>
+    <sys:String x:Key="Remind">Remind</sys:String>
 </ResourceDictionary>

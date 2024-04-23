@@ -6,6 +6,9 @@
     xmlns:prism="http://prismlibrary.com/">
     <Application.Resources>
         <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/LayUI.Wpf;component/Themes/Default.xaml" />
+            </ResourceDictionary.MergedDictionaries>
             <ResourceDictionary x:Key="lang">
                 <ResourceDictionary.MergedDictionaries>
                     <ResourceDictionary Source="/languages/en_US.xaml" />

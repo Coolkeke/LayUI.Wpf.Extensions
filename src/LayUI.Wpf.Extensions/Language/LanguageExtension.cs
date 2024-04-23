@@ -150,7 +150,7 @@ namespace LayUI.Wpf.Extensions
             }
             else
             {
-                value = _Key.ToString();
+                value = _Key==null? string.Empty: _Key.ToString();
             }
             if (value is null) value = string.Empty;
             value = Source[value] == null ? value : Source[value];

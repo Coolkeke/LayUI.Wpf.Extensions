@@ -1,4 +1,5 @@
-﻿using Prism.Commands;
+﻿using LayUI.Wpf.Global;
+using Prism.Commands;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
@@ -106,6 +107,14 @@ namespace LayUI.Wpf.Extensions.App.ViewModels
         void ExecuteTextChangedCommand()
         { 
             LanguageExtension.Refresh();
+        }
+        private DelegateCommand _MessageBoxCommand;
+        public DelegateCommand MessageBoxCommand =>
+            _MessageBoxCommand ?? (_MessageBoxCommand = new DelegateCommand(ExecuteMessageBoxCommand));
+
+        void ExecuteMessageBoxCommand()
+        {
+            LayDialog.Show("MessageBox",null,"Root");
         }
     }
 }
