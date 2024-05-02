@@ -64,7 +64,7 @@ namespace LayUI.Wpf.Extensions.App.ViewModels
                 new Data(){ Value="Test" },
                 new Data(){ Value="Test" },
             };
-            LanguageExtension.LoadDictionary(Languages[1]);
+            LanguageExtension.LoadResourceKey("zh_CN");
         }
         private DelegateCommand _USCommand;
         public DelegateCommand USCommand =>
@@ -72,7 +72,7 @@ namespace LayUI.Wpf.Extensions.App.ViewModels
 
         void ExecuteUSCommand()
         {
-            LanguageExtension.LoadDictionary(Languages[0]);
+            LanguageExtension.LoadResourceKey("en_US");
         }
         private DelegateCommand _CNCommand;
         public DelegateCommand CNCommand =>
@@ -80,7 +80,7 @@ namespace LayUI.Wpf.Extensions.App.ViewModels
 
         void ExecuteCNCommand()
         {
-            LanguageExtension.LoadDictionary(Languages[1]);
+            LanguageExtension.LoadResourceKey("zh_CN");
         }
         private DelegateCommand _LoadItemsCommand;
         public DelegateCommand LoadItemsCommand =>

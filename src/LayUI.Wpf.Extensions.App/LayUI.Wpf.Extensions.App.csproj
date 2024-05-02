@@ -16,7 +16,11 @@
     <ProjectReference Include="..\LayUI.Wpf.Extensions\LayUI.Wpf.Extensions.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="languages\en_US.xaml" />
-    <Resource Include="languages\zh_CN.xaml" />
+    <Content Include="languages\en_US.xaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="languages\zh_CN.xaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>

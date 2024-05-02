@@ -9,6 +9,8 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/LayUI.Wpf;component/Themes/Default.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary x:Key="en_US" Source="pack://SiteOfOrigin:,,,/languages/en_US.xaml" />
+            <ResourceDictionary x:Key="zh_CN" Source="pack://SiteOfOrigin:,,,/languages/zh_CN.xaml" />
             <ResourceDictionary x:Key="lang">
                 <ResourceDictionary.MergedDictionaries>
                     <ResourceDictionary Source="/languages/en_US.xaml" />
