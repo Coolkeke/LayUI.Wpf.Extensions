@@ -27,13 +27,7 @@
         <StackPanel Grid.Row="1">
             <TextBlock Text="{lay:Language {Binding Name}}" />
             <TextBlock Text="{lay:Language Key='123'}" />
-            <TextBox Text="{Binding Items[3].Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                <be:Interaction.Triggers>
-                    <be:EventTrigger EventName="TextChanged">
-                        <be:InvokeCommandAction Command="{Binding TextChangedCommand}" />
-                    </be:EventTrigger>
-                </be:Interaction.Triggers>
-            </TextBox>
+            <TextBox Text="{Binding Items[3].Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <ItemsControl ItemsSource="{Binding Items}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>

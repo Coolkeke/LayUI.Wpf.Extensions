@@ -10,6 +10,9 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using System.Xml.Linq;
+using System.ComponentModel;
+using System.Globalization;
+using System.Runtime.InteropServices;
 
 namespace LayUI.Wpf.Extensions
 {
@@ -18,6 +21,23 @@ namespace LayUI.Wpf.Extensions
     /// </summary>
     public class LanguageExtension : MarkupExtension
     {
+        private class LanguageConverter : IMultiValueConverter
+        {
+            public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+            {
+                if (values.Length != 2 || values[0] is null || !(values[1] is ResourceDictionary)) return string.Empty;
+                if (values[0].Equals(DependencyProperty.UnsetValue)) return parameter;
+                var key = values[0].ToString();
+                var lanugages = (ResourceDictionary)values[1];
+                var value = lanugages.Contains(key) ? lanugages[key] : key;
+                return value;
+            }
+
+            public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+            {
+                throw new NotImplementedException();
+            }
+        }
         private static Action action;
         private object _Key;
         public LanguageExtension() { }
@@ -100,62 +120,102 @@ namespace LayUI.Wpf.Extensions
         {
             if (action != null) action.Invoke();
         }
-
         public override object ProvideValue(IServiceProvider serviceProvider)
         {
-            object value = null;
             if (!(serviceProvider.GetService(typeof(IProvideValueTarget)) is IProvideValueTarget provideValueTarget)) return this;
             if (provideValueTarget.TargetObject.GetType().FullName == "System.Windows.SharedDp") return this;
             if (!(provideValueTarget.TargetObject is DependencyObject targetObject)) return this;
             if (!(provideValueTarget.TargetProperty is DependencyProperty targetProperty)) return this;
+            Action LanguageEvent = null;
+            LanguageEvent = () =>
+            {
+                BindingOperations.SetBinding(targetObject, targetProperty, CreateBinding(Key));
+            };
+            RoutedEventHandler loaded = null;
+            RoutedEventHandler unLoaded = null;
+            loaded = (o, e) =>
+            {
+                action += LanguageEvent;
+                if (o is FrameworkElement)
+                {
+                    (o as FrameworkElement).Loaded -= loaded;
+                    (o as FrameworkElement).Loaded += loaded;
+                }
+                if (o is FrameworkContentElement)
+                {
+                    (o as FrameworkContentElement).Loaded -= loaded;
+                    (o as FrameworkContentElement).Loaded += loaded;
+                }
+            };
+            unLoaded = (o, e) =>
+            {
+                action -= LanguageEvent;
+                if (o is FrameworkElement)
+                {
+                    (o as FrameworkElement).Unloaded -= unLoaded;
+                    (o as FrameworkElement).Unloaded += unLoaded;
+                }
+                else if (o is FrameworkContentElement)
+                {
+                    (o as FrameworkContentElement).Unloaded -= unLoaded;
+                    (o as FrameworkContentElement).Unloaded += unLoaded;
+                }
+            };
             if (targetObject is FrameworkElement element)
             {
-                element.DataContextChanged += (o, e) =>
+                element.Loaded += loaded;
+                element.Unloaded += unLoaded;
+                DependencyPropertyChangedEventHandler elementDataContextChanged = null;
+                elementDataContextChanged += (o, e) =>
                 {
-                    SetLanguage(targetObject, targetProperty, element.DataContext, ref value);
-                }; 
-                action += () =>
-                {
-                    SetLanguage(targetObject, targetProperty, element.DataContext, ref value);
+                    element.DataContextChanged -= elementDataContextChanged;
+                    element.DataContextChanged += elementDataContextChanged;
+                    BindingOperations.SetBinding(targetObject, targetProperty, CreateBinding(Key));
                 };
-                SetLanguage(targetObject, targetProperty, element.DataContext, ref value);
-                if (value is null) value = string.Empty;
-                value = Source[value] == null ? value : Source[value];
-                return value;
+                element.DataContextChanged += elementDataContextChanged;
             }
-            return string.Empty;
+            else if (targetObject is FrameworkContentElement contentElement)
+            {
+                contentElement.Loaded += loaded;
+                contentElement.Unloaded += unLoaded;
+                DependencyPropertyChangedEventHandler contentElementDataContextChanged = null;
+                contentElementDataContextChanged += (o, e) =>
+                {
+                    contentElement.DataContextChanged -= contentElementDataContextChanged;
+                    contentElement.DataContextChanged += contentElementDataContextChanged;
+                    BindingOperations.SetBinding(targetObject, targetProperty, CreateBinding(Key));
+                };
+                contentElement.DataContextChanged += contentElementDataContextChanged;
+            }
+            return CreateBinding(Key).ProvideValue(serviceProvider);
         }
 
-        /// <summary>
-        /// 修改文字翻译
-        /// </summary>
-        /// <param name="element">作用目标元素</param>
-        /// <param name="targetProperty">作用属性</param>
-        /// <param name="dataContext">数据上下文</param>
-        /// <param name="value">输出值</param>
-        private void SetLanguage(DependencyObject element, DependencyProperty targetProperty, object dataContext, ref object value)
+        private MultiBinding CreateBinding(object key)
         {
-            Binding binding = new Binding()
+            MultiBinding binding = new MultiBinding();
+            if (key is Binding sorueBinding)
             {
-                Source = dataContext,
-                UpdateSourceTrigger = UpdateSourceTrigger.Explicit,
-                Mode = BindingMode.OneWay
-            };
-            if (_Key is Binding)
-            {
-                binding.Path = ((Binding)_Key).Path;
-                BindingOperations.SetBinding(element, targetProperty, binding);
-                value = element.GetValue(targetProperty) as string;
-                if (string.IsNullOrEmpty(value.ToString())) value = ((Binding)_Key).Path.Path;
+                binding.ConverterParameter = sorueBinding.Path.Path;
+                binding.Bindings.Add(sorueBinding);
             }
             else
             {
-                value = _Key==null? string.Empty: _Key.ToString();
+                binding.ConverterParameter = key;
+                binding.Bindings.Add(new Binding()
+                {
+                    Source = key,
+                    Mode = BindingMode.OneWay
+                }); 
             }
-            if (value is null) value = string.Empty;
-            value = Source[value] == null ? value : Source[value];
-            element.SetValue(targetProperty, value);
+            binding.Bindings.Add(new Binding()
+            {
+                Source = Source,
+                Mode = BindingMode.OneWay
+            });
+            binding.Converter = new LanguageConverter();
+            return binding;
         }
+
     }
 
 }
