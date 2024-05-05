@@ -25,6 +25,7 @@
             <Button Command="{Binding MessageBoxCommand}" Content="打开对话框" />
         </StackPanel>
         <StackPanel Grid.Row="1">
+            <TextBlock Text="{DynamicResource Title}" />
             <TextBlock Text="{lay:Language {Binding Name}}" />
             <TextBlock Text="{lay:Language Key='123'}" />
             <TextBox Text="{Binding Items[3].Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
