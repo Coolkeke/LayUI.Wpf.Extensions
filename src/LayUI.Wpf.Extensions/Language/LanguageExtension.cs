@@ -149,7 +149,13 @@ namespace LayUI.Wpf.Extensions
             try
             { 
                 Action LanguageEvent = null;
-                LanguageEvent = () => BindingOperations.SetBinding(targetObject, targetProperty, CreateBinding(Key)); ;
+                LanguageEvent = async () =>
+                {
+                   await targetObject.Dispatcher.InvokeAsync(() =>
+                    {
+                        BindingOperations.SetBinding(targetObject, targetProperty, CreateBinding(Key));
+                    });
+                }; ;
                 RoutedEventHandler loaded = null;
                 RoutedEventHandler unLoaded = null;
                 loaded = (o, e) =>
@@ -185,11 +191,14 @@ namespace LayUI.Wpf.Extensions
                     element.Loaded += loaded;
                     element.Unloaded += unLoaded;
                     DependencyPropertyChangedEventHandler elementDataContextChanged = null;
-                    elementDataContextChanged += (o, e) =>
+                    elementDataContextChanged += async (o, e) =>
                     {
                         element.DataContextChanged -= elementDataContextChanged;
                         element.DataContextChanged += elementDataContextChanged;
-                        BindingOperations.SetBinding(targetObject, targetProperty, CreateBinding(Key));
+                       await element.Dispatcher.InvokeAsync(() =>
+                        {
+                            BindingOperations.SetBinding(targetObject, targetProperty, CreateBinding(Key));
+                        });
                     };
                     element.DataContextChanged += elementDataContextChanged;
                 }
