@@ -12,14 +12,59 @@ using System.Windows.Threading;
 using System.Xml.Linq;
 using System.ComponentModel;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 
 namespace LayUI.Wpf.Extensions
 {
+    public class MarkupExtensionBindableBase : MarkupExtension, INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected virtual bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+        {
+            if (EqualityComparer<T>.Default.Equals(storage, value))
+            {
+                return false;
+            }
+
+            storage = value;
+            RaisePropertyChanged(propertyName);
+            return true;
+        }
+        protected virtual bool SetProperty<T>(ref T storage, T value, Action onChanged, [CallerMemberName] string propertyName = null)
+        {
+            if (EqualityComparer<T>.Default.Equals(storage, value))
+            {
+                return false;
+            }
+
+            storage = value;
+            onChanged?.Invoke();
+            RaisePropertyChanged(propertyName);
+            return true;
+        }
+        protected void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            OnPropertyChanged(propertyName);
+        }
+        protected virtual void OnPropertyChanged(PropertyChangedEventArgs args)
+        {
+            this.PropertyChanged?.Invoke(this, args);
+        }
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+        }
+        public  override object ProvideValue(IServiceProvider serviceProvider)
+        {
+            throw new NotImplementedException();
+        }
+    }
     /// <summary>
     /// 多语言扩展类
     /// </summary>
-    public class LanguageExtension : MarkupExtension
+    public class LanguageExtension : MarkupExtensionBindableBase
     {
+        internal static LanguageExtension Instance = new LanguageExtension(); 
         private class LanguageConverter : IMultiValueConverter
         {
             public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
@@ -52,36 +97,23 @@ namespace LayUI.Wpf.Extensions
             get { return _Key; }
             set { _Key = value; }
         }
-        /// <summary>
-        /// 临时翻译数据源
-        /// </summary>
-        private static ResourceDictionary localSource;
-
-        private static ResourceDictionary source;
+          
+        private ResourceDictionary _Source;
         /// <summary>
         /// 翻译数据内存源数据
         /// </summary>
-        private static ResourceDictionary Source
+        public ResourceDictionary Source
         {
             get
             {
-                if (source == null) source = new ResourceDictionary();
-                return source;
+                if (_Source == null) _Source = new ResourceDictionary();
+                return _Source;
             }
-            set
-            {
-                if (source != value)
-                {
-                    source = value;
-                    Refresh();
-                }
+            set 
+            { 
+                SetProperty(ref _Source, value); 
             }
         }
-        /// <summary>
-        /// 判断初始化加载
-        /// </summary>
-        private static bool IsLoadedLanguage { get; set; }
-
         /// <summary>
         /// 获取内存中已加载的翻译结果
         /// </summary>
@@ -89,7 +121,7 @@ namespace LayUI.Wpf.Extensions
         /// <returns></returns>
         public static object GetValue(string key)
         {
-            if (Source != null && Source.Contains(key)) return Source[key];
+            if (Instance.Source != null && Instance.Source.Contains(key)) return Instance.Source[key];
             return key;
         }
         /// <summary>
@@ -126,18 +158,18 @@ namespace LayUI.Wpf.Extensions
         /// <param name="languageDictionary"></param>
         public static void LoadDictionary(ResourceDictionary languageDictionary)
         {
-            Source = languageDictionary;
+            Instance.Source = languageDictionary;
+            Refresh();
         }
         /// <summary>
         /// 刷新页面可视化语言
         /// </summary>
         public static void Refresh()
         {
-            lock (Source)
-            {
-                if (action == null) return;
+            lock (Instance.Source)
+            { 
                 AddApplicationResourcesLanguage();
-                action.Invoke();
+                action?.Invoke();
             }
         }
         public override object ProvideValue(IServiceProvider serviceProvider)
@@ -147,18 +179,18 @@ namespace LayUI.Wpf.Extensions
             if (!(provideValueTarget.TargetObject is DependencyObject targetObject)) return this;
             if (!(provideValueTarget.TargetProperty is DependencyProperty targetProperty)) return this;
             try
-            { 
+            {
                 Action LanguageEvent = null;
                 LanguageEvent = async () =>
                 {
-                   await targetObject.Dispatcher.InvokeAsync(() =>
-                    {
-                        BindingOperations.SetBinding(targetObject, targetProperty, CreateBinding(Key));
-                    });
+                    await targetObject.Dispatcher.InvokeAsync(() =>
+                     {
+                         BindingOperations.SetBinding(targetObject, targetProperty, CreateBinding(Key));
+                     });
                 }; ;
                 RoutedEventHandler loaded = null;
                 RoutedEventHandler unLoaded = null;
-                loaded = (o, e) =>
+                loaded = async (o, e) =>
                 {
                     action += LanguageEvent;
                     if (o is FrameworkElement)
@@ -171,6 +203,10 @@ namespace LayUI.Wpf.Extensions
                         (o as FrameworkContentElement).Loaded -= loaded;
                         (o as FrameworkContentElement).Loaded += loaded;
                     }
+                    await targetObject.Dispatcher.InvokeAsync(() =>
+                    {
+                        BindingOperations.SetBinding(targetObject, targetProperty, CreateBinding(Key));
+                    });
                 };
                 unLoaded = (o, e) =>
                 {
@@ -195,10 +231,10 @@ namespace LayUI.Wpf.Extensions
                     {
                         element.DataContextChanged -= elementDataContextChanged;
                         element.DataContextChanged += elementDataContextChanged;
-                       await element.Dispatcher.InvokeAsync(() =>
-                        {
-                            BindingOperations.SetBinding(targetObject, targetProperty, CreateBinding(Key));
-                        });
+                        await element.Dispatcher.InvokeAsync(() =>
+                         {
+                             BindingOperations.SetBinding(targetObject, targetProperty, CreateBinding(Key));
+                         });
                     };
                     element.DataContextChanged += elementDataContextChanged;
                 }
@@ -214,8 +250,7 @@ namespace LayUI.Wpf.Extensions
                         BindingOperations.SetBinding(targetObject, targetProperty, CreateBinding(Key));
                     };
                     contentElement.DataContextChanged += contentElementDataContextChanged;
-                }
-                if (!IsLoadedLanguage) IsLoadedLanguage = AddApplicationResourcesLanguage();
+                } 
                 return CreateBinding(Key).ProvideValue(serviceProvider);
             }
             catch (Exception ex)
@@ -233,11 +268,10 @@ namespace LayUI.Wpf.Extensions
                 var window = Application.Current?.MainWindow;
                 if (window != null && !DesignerProperties.GetIsInDesignMode(window))
                 {
-                    if (localSource == null) localSource = source;
-                    var lang = Application.Current.Resources?.MergedDictionaries?.Where(o => o.Source == localSource.Source)?.FirstOrDefault();
+                    if (Instance.Source == null) return false;
+                    var lang = Application.Current.Resources?.MergedDictionaries?.Where(o => o.Source == Instance.Source.Source)?.FirstOrDefault();
                     if (lang != null) Application.Current.Resources?.MergedDictionaries?.Remove(lang);
-                    Application.Current.Resources?.MergedDictionaries?.Add(Source);
-                    localSource = Source;
+                    Application.Current.Resources?.MergedDictionaries?.Add(Instance.Source);
                 }
                 return true;
             }
@@ -270,7 +304,7 @@ namespace LayUI.Wpf.Extensions
             }
             binding.Bindings.Add(new Binding()
             {
-                Source = Source,
+                Source = Instance.Source,
                 Mode = BindingMode.OneWay
             });
             binding.Converter = new LanguageConverter();

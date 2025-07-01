@@ -7,12 +7,16 @@
     xmlns:layUI="clr-namespace:LayUI.Wpf.Controls;assembly=LayUI.Wpf"
     xmlns:layUIGlobal="clr-namespace:LayUI.Wpf.Global;assembly=LayUI.Wpf"
     xmlns:prism="http://prismlibrary.com/"
+    xmlns:vm="clr-namespace:LayUI.Wpf.Extensions.App.ViewModels"
     Title="{lay:Language {Binding Title}}"
     Width="525"
     Height="350"
     prism:ViewModelLocator.AutoWireViewModel="True"
     FontSize="20"
     WindowStartupLocation="CenterScreen">
+    <be:Interaction.Behaviors>
+        <vm:WindowBehavior InitializedCommand="{Binding InitializedCommand}" />
+    </be:Interaction.Behaviors>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />

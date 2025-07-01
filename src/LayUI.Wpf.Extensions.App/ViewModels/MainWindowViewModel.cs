@@ -1,14 +1,66 @@
 ﻿using LayUI.Wpf.Global;
+using Microsoft.Xaml.Behaviors;
 using Prism.Commands;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Documents;
+using System.Windows.Input;
 
 namespace LayUI.Wpf.Extensions.App.ViewModels
 {
+    public class WindowBehavior : Behavior<Window>
+    {
+        public ICommand InitializedCommand
+        {
+            get { return (ICommand)GetValue(InitializedCommandProperty); }
+            set { SetValue(InitializedCommandProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for InitializedCommand.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty InitializedCommandProperty =
+            DependencyProperty.Register("InitializedCommand", typeof(ICommand), typeof(WindowBehavior));
+        protected override void OnAttached()
+        {
+            base.OnAttached();
+            AssociatedObject.Initialized += AssociatedObject_Initialized;
+        }
+        private void AssociatedObject_Initialized(object sender, EventArgs e)
+        {
+            InitializedCommand?.Execute(null);
+        }
+        protected override void OnDetaching()
+        {
+            base.OnDetaching();
+            AssociatedObject.Initialized -= AssociatedObject_Initialized;
+        }
+
+    }
+    public class Language : BindableBase
+    {
+        private string _Title;
+        public string Title
+        {
+            get { return _Title; }
+            set { SetProperty(ref _Title, value); }
+        }
+        private string _Icon;
+        public string Icon
+        {
+            get { return _Icon; }
+            set { SetProperty(ref _Icon, value); }
+        }
+        private string _Key;
+        public string Key
+        {
+            get { return _Key; }
+            set { SetProperty(ref _Key, value); }
+        }
+
+    }
     public class Data : BindableBase
     {
         private string _Value;
@@ -21,17 +73,35 @@ namespace LayUI.Wpf.Extensions.App.ViewModels
 
     public class MainWindowViewModel : BindableBase
     {
-        private List<ResourceDictionary> _Languages = new List<ResourceDictionary>()
+        private List<Language> _Languages = new List<Language>()
         {
-            ((ResourceDictionary)Application.Current.FindResource("lang")).MergedDictionaries[0],
-            ((ResourceDictionary)Application.Current.FindResource("lang")).MergedDictionaries[1],
+            new Language(){ Title="中文",Icon="/Images/Svg/cn.svg",Key="zh_CN" },
+            new Language(){ Title="英语",Icon="/Images/Svg/um.svg",Key="en_US" },
         };
-        public List<ResourceDictionary> Languages
+        public List<Language> Languages
         {
             get { return _Languages; }
             set { SetProperty(ref _Languages, value); }
         }
+        private Language _Language;
+        public Language Language
+        {
+            get { return _Language; }
+            set
+            {
+                SetProperty(ref _Language, value);
+                LanguageExtension.LoadResourceKey(Language.Key);
+            }
+        }
+        private DelegateCommand _InitializedCommand;
+        public DelegateCommand InitializedCommand =>
+            _InitializedCommand ?? (_InitializedCommand = new DelegateCommand(ExecuteInitializedCommand));
 
+        void ExecuteInitializedCommand()
+        {
+            Language = Languages.FirstOrDefault();
+
+        }
         private ObservableCollection<Data> _Items;
         public ObservableCollection<Data> Items
         {
@@ -64,7 +134,6 @@ namespace LayUI.Wpf.Extensions.App.ViewModels
                 new Data(){ Value="Test" },
                 new Data(){ Value="Test" },
             };
-            LanguageExtension.LoadResourceKey("zh_CN");
         }
         private DelegateCommand _USCommand;
         public DelegateCommand USCommand =>
@@ -105,7 +174,7 @@ namespace LayUI.Wpf.Extensions.App.ViewModels
             _TextChangedCommand ?? (_TextChangedCommand = new DelegateCommand(ExecuteTextChangedCommand));
 
         void ExecuteTextChangedCommand()
-        { 
+        {
             LanguageExtension.Refresh();
         }
         private DelegateCommand _MessageBoxCommand;
@@ -114,7 +183,7 @@ namespace LayUI.Wpf.Extensions.App.ViewModels
 
         void ExecuteMessageBoxCommand()
         {
-            LayDialog.Show("MessageBox",null,"Root");
+            LayDialog.Show("MessageBox", null, "Root");
         }
     }
 }

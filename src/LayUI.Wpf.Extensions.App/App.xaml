@@ -10,17 +10,11 @@
     mc:Ignorable="d">
     <Application.Resources>
         <ResourceDictionary>
-            <ResourceDictionary x:Key="lang">
-                <ResourceDictionary.MergedDictionaries>
-                    <ResourceDictionary Source="/languages/en_US.xaml" />
-                    <ResourceDictionary Source="/languages/zh_CN.xaml" />
-                </ResourceDictionary.MergedDictionaries>
-            </ResourceDictionary>
             <ResourceDictionary x:Key="en_US" Source="pack://SiteOfOrigin:,,,/languages/en_US.xaml" />
             <ResourceDictionary x:Key="zh_CN" Source="pack://SiteOfOrigin:,,,/languages/zh_CN.xaml" />
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/LayUI.Wpf;component/Themes/Default.xaml" />
-                <ResourceDictionary Source="pack://SiteOfOrigin:,,,/languages/zh_CN.xaml" />
+
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
