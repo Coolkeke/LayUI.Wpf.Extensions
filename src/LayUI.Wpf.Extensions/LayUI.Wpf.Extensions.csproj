@@ -6,11 +6,13 @@
 		<AssemblyTitle>LayUI.Wpf.Extensions</AssemblyTitle>
 		<Description>这是一款WPF版Layui库扩展类</Description>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<GenerateDocumentationFile>False</GenerateDocumentationFile>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<Authors>wenke</Authors>
 		<Copyright>该目标相关的库归Coolkeke（wenke）所有，如若采用本库相关的代码请标记说明</Copyright>
 		<PackageProjectUrl>https://www.nuget.org/packages/LayUI.Wpf.Extensions</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/Coolkeke/LayUI.Wpf.Extensions</RepositoryUrl>
+		<ProduceReferenceAssembly>True</ProduceReferenceAssembly>
+		<Version>1.0.2.250701</Version>
 	</PropertyGroup>
 
 </Project>
